@@ -4,11 +4,12 @@ namespace Dagboken
 {
     public class DiaryEntry
     {
-        public DateTime Date;
-        public string Text;
+        public DateTime Date { get; set; }
+        public string Text { get; set; }
 
-        public DiaryEntry()
+        public override string ToString()
         {
+            return $"{Date:yyyy-MM-dd} - {Text}";
         }
     }
 }
