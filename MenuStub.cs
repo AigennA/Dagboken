@@ -73,7 +73,16 @@ namespace Dagboken
 
         private void SearchEntry()
         {
+            DateTime date = PromptForDate("Datum att söka (yyyy-MM-dd): ");
+            if (date == DateTime.MinValue) return;
+
+            DiaryEntry? entry = _diaryService.GetEntryByDate(date);
+            if (entry != null)
+                Console.WriteLine(entry.Date.ToString("yyyy-MM-dd") + " - " + entry.Text);
+            else
+                Console.WriteLine("Ingen anteckning hittades.");
         }
+
 
         private void UpdateEntry()
         {

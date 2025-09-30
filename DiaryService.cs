@@ -34,6 +34,11 @@ namespace Dagboken
 
         public DiaryEntry GetEntryByDate(DateTime date)
         {
+            if (_entryDict.ContainsKey(date))
+            {
+                return _entryDict[date];
+            }
+
             return null;
         }
 
