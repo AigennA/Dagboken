@@ -1,15 +1,15 @@
-﻿namespace Dagboken
+﻿using Dagboken;
+
+
+class Program
 {
-  
-    internal class Program
+    static void Main()
     {
-        static void Main()
-        {
-            Console.WriteLine("Hello from Dagboken");
-            DiaryService dagbok = new DiaryService();
-            FileHandler filhanterare = new FileHandler("diary.json");
-          
-        }
+        var diaryService = new DiaryService();
+        var fileHandler = new FileHandler("diary.json");
+        diaryService.LoadFromFile(fileHandler.LoadEntries());
+
+        var menuStub = new MenuStub(diaryService, fileHandler);
+        menuStub.Run();
     }
 }
-
