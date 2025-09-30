@@ -52,7 +52,7 @@ namespace Dagboken
 
         private void ShowMenu()
         {
-            Console.WriteLine("=== Min Dagbok ===");
+            Console.WriteLine("=== DAGBOKEN ===");
             Console.WriteLine("1. Skriv ny anteckning");
             Console.WriteLine("2. Lista alla anteckningar");
             Console.WriteLine("3. Sök anteckning på datum");
