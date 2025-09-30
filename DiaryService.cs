@@ -6,18 +6,20 @@ namespace Dagboken
 {
     public class DiaryService
     {
-        private List<DiaryEntry> _entries;
-        private Dictionary<DateTime, DiaryEntry> _entryDict;
+        private readonly List<DiaryEntry> _entries = new();
+        private readonly Dictionary<DateTime, DiaryEntry> _entryDict = new();
 
-        public DiaryService()
-        {
-            _entries = new List<DiaryEntry>();
-            _entryDict = new Dictionary<DateTime, DiaryEntry>();
-        }
+        public IReadOnlyList<DiaryEntry> GetAllEntries() => _entries;
+
 
         public bool AddEntry(DateTime date, string text)
         {
-            return false;
+            if (string.IsNullOrWhiteSpace(text)) return false;
+
+            var entry = new DiaryEntry { Date = date, Text = text };
+            _entries.Add(entry);
+            _entryDict[date] = entry;
+            return true;
         }
 
         public bool UpdateEntry(DateTime date, string newText)
@@ -35,10 +37,6 @@ namespace Dagboken
             return null;
         }
 
-        public List<DiaryEntry> GetAllEntries()
-        {
-            return new List<DiaryEntry>();
-        }
 
         public void LoadFromFile(List<DiaryEntry> lista)
         {
