@@ -197,8 +197,10 @@ namespace Dagboken
 
             var entries = _diaryService.GetAllEntries();
             _fileHandler.SaveEntries(entries.ToList());
-            Console.WriteLine("Sparat till fil.");
+
+            Console.WriteLine($"{entries.Count} anteckningar har sparats till filen.");
         }
+
 
         private void ReadFromFile()
         {
@@ -209,8 +211,21 @@ namespace Dagboken
 
             var loaded = _fileHandler.LoadEntries();
             _diaryService.LoadFromFile(loaded);
-            Console.WriteLine("Läst från fil.");
+
+            Console.WriteLine($"{loaded.Count} anteckningar har lästs in från filen.\n");
+
+            if (loaded.Count > 0)
+            {
+                Console.WriteLine("Inlästa anteckningar:");
+                foreach (var entry in loaded.OrderBy(e => e.Date))
+                    Console.WriteLine(entry.ToString());
+            }
+            else
+            {
+                Console.WriteLine("Filen var tom eller inga giltiga anteckningar.");
+            }
         }
+
 
         private void ExportToCsv()
         {
