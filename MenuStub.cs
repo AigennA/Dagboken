@@ -137,7 +137,7 @@ namespace Dagboken
             Console.Write("Läser från minnet");
             for (int i = 0; i < 3; i++)
             {
-                Thread.Sleep(400); // Väntar 400 ms per punkt
+                Thread.Sleep(200); // Väntar 200 ms per punkt
                 Console.Write(".");
             }
             Console.WriteLine("\n");
