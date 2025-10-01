@@ -229,14 +229,18 @@ namespace Dagboken
 
         private void ExportToCsv()
         {
-            Console.Clear();
-            Console.WriteLine("╔════════════════════════════╗");
-            Console.WriteLine("║     EXPORTERA TILL CSV     ║");
-            Console.WriteLine("╚════════════════════════════╝");
-
             var entries = _diaryService.GetAllEntries();
+
+            if (entries.Count == 0)
+            {
+                Console.WriteLine("Inga anteckningar att exportera.");
+                return;
+            }
+
             _fileHandler.ExportToCsv(entries.ToList(), "dagbok.csv");
+            Console.WriteLine($"{entries.Count} anteckningar har exporterats till dagbok.csv.");
         }
+
 
         private DateTime PromptForDate(string prompt)
         {
