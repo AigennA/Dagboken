@@ -1,5 +1,7 @@
 ﻿using System;
 
+using System;
+
 namespace Dagboken
 {
     public class DiaryEntry

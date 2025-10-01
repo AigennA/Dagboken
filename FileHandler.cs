@@ -1,5 +1,4 @@
-﻿using Dagboken;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
@@ -9,81 +8,78 @@ namespace Dagboken
     public class FileHandler
     {
         private readonly string _filePath;
-        private readonly string _loggfil = "error.log";
+        private readonly string _logFile = "error.log";
 
         public FileHandler(string filePath)
         {
             _filePath = filePath;
         }
 
-        // Läser anteckningar från fil och returnerar en lista
+        // Läser anteckningar från JSON-fil
         public List<DiaryEntry> LoadEntries()
         {
-            List<DiaryEntry> lista = new List<DiaryEntry>();
+            List<DiaryEntry> entries = new();
 
             try
             {
                 if (!File.Exists(_filePath))
-                    return lista;
+                    return entries;
 
-                string innehåll = File.ReadAllText(_filePath);
-                lista = JsonSerializer.Deserialize<List<DiaryEntry>>(innehåll);
-
-                if (lista == null)
-                    lista = new List<DiaryEntry>();
+                string content = File.ReadAllText(_filePath);
+                entries = JsonSerializer.Deserialize<List<DiaryEntry>>(content) ?? new();
             }
-            catch (Exception fel)
+            catch (Exception ex)
             {
-                LoggaFel("Fel vid läsning från fil: " + fel.Message);
+                LogError("Fel vid läsning från fil: " + ex.Message);
                 Console.WriteLine("Kunde inte läsa filen. Se error.log för detaljer.");
             }
 
-            return lista;
+            return entries;
         }
 
-        // Sparar anteckningar till fil i JSON-format
-        public void SaveEntries(List<DiaryEntry> lista)
+        // Sparar anteckningar till JSON-fil
+        public void SaveEntries(List<DiaryEntry> entries)
         {
             try
             {
-                string json = JsonSerializer.Serialize(lista, new JsonSerializerOptions { WriteIndented = true });
+                string json = JsonSerializer.Serialize(entries, new JsonSerializerOptions { WriteIndented = true });
                 File.WriteAllText(_filePath, json);
             }
-            catch (Exception fel)
+            catch (Exception ex)
             {
-                LoggaFel("Fel vid skrivning till fil: " + fel.Message);
+                LogError("Fel vid skrivning till fil: " + ex.Message);
                 Console.WriteLine("Kunde inte spara filen. Se error.log för detaljer.");
             }
         }
-        //En CSV-fil (Comma-Separated Values) är en enkel textfil
-        public void ExportToCsv(List<DiaryEntry> lista, string csvFil)
+
+        // Exporterar anteckningar till CSV-fil
+        public void ExportToCsv(List<DiaryEntry> entries, string csvFile)
         {
             try
             {
-                List<string> rader = new List<string>();
+                List<string> lines = new();
 
-                for (int i = 0; i < lista.Count; i++)
+                foreach (var entry in entries)
                 {
-                    DiaryEntry post = lista[i];
-                    string rad = post.Date.ToString("yyyy-MM-dd") + ";\"" + post.Text.Replace("\"", "\"\"") + "\"";
-                    rader.Add(rad);
+                    string line = $"{entry.Date:yyyy-MM-dd};\"{entry.Text.Replace("\"", "\"\"")}\"";
+                    lines.Add(line);
                 }
 
-                File.WriteAllLines(csvFil, rader);
-                Console.WriteLine("Exporterat till " + csvFil);
+                File.WriteAllLines(csvFile, lines);
+                Console.WriteLine("Exporterat till " + csvFile);
             }
-            catch (Exception fel)
+            catch (Exception ex)
             {
-                LoggaFel("Fel vid CSV-export: " + fel.Message);
+                LogError("Fel vid CSV-export: " + ex.Message);
                 Console.WriteLine("Kunde inte exportera till CSV. Se error.log.");
             }
         }
 
         // Loggar fel till separat textfil
-        private void LoggaFel(string meddelande)
+        private void LogError(string message)
         {
-            string rad = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + " - " + meddelande;
-            File.AppendAllText(_loggfil, rad + Environment.NewLine);
+            string line = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} - {message}";
+            File.AppendAllText(_logFile, line + Environment.NewLine);
         }
     }
 }
