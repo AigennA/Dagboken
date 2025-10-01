@@ -14,7 +14,9 @@ namespace Dagboken
 
         public bool AddEntry(DateTime date, string text)
         {
+            date = date.Date; // Normalisera datum
             if (string.IsNullOrWhiteSpace(text)) return false;
+            if (_entryDict.ContainsKey(date)) return false; 
 
             var entry = new DiaryEntry { Date = date, Text = text };
             _entries.Add(entry);
@@ -24,11 +26,20 @@ namespace Dagboken
 
         public DiaryEntry? GetEntryByDate(DateTime date)
         {
+            date = date.Date; // Normalisera datum
             return _entryDict.TryGetValue(date, out var entry) ? entry : null;
+        }
+
+        public List<DiaryEntry> SearchEntriesByText(string keyword)
+        {
+            return _entries
+                .Where(e => e.Text.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+                .ToList();
         }
 
         public bool UpdateEntry(DateTime date, string newText)
         {
+            date = date.Date; // Normalisera datum
             if (_entryDict.ContainsKey(date) && !string.IsNullOrWhiteSpace(newText))
             {
                 _entryDict[date].Text = newText;
@@ -39,6 +50,7 @@ namespace Dagboken
 
         public bool RemoveEntry(DateTime date)
         {
+            date = date.Date; // Normalisera datum
             if (_entryDict.ContainsKey(date))
             {
                 var entry = _entryDict[date];
@@ -59,5 +71,12 @@ namespace Dagboken
                 _entryDict[entry.Date] = entry;
             }
         }
+        public void SaveToFile(string filePath)
+        {
+            using var writer = new StreamWriter(filePath);
+            foreach (var entry in _entries)
+                writer.WriteLine($"{entry.Date:yyyy-MM-dd}||{entry.Text}");
+        }
+
     }
 }

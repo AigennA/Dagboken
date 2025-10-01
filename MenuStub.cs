@@ -32,19 +32,29 @@ namespace Dagboken
                     case "1": WriteEntry(); break;
                     case "2": ListEntries(); break;
                     case "3": SearchEntry(); break;
-                    case "4": UpdateEntry(); break;
-                    case "5": DeleteEntry(); break;
-                    case "6": SaveToFile(); break;
-                    case "7": ReadFromFile(); break;
-                    case "8":
+                    case "4": SearchEntryByText(); break;
+                    case "5": UpdateEntry(); break;
+                    case "6": DeleteEntry(); break;
+                    case "7": SaveToFile(); break;
+                    case "8": ReadFromFile(); break;
+                    case "9":
                         SaveToFile();
-                        Console.WriteLine("Tack för att du använde Dagboken.");
+                        Console.Clear();
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine("╔════════════════════════════════════════════╗");
+                        Console.WriteLine("║                                            ║");
+                        Console.WriteLine("║   ✨ Tack för att du använde Dagboken ✨   ║");
+                        Console.WriteLine("║                                            ║");
+                        Console.WriteLine("╚════════════════════════════════════════════╝");
+                        Console.ResetColor();
+
                         running = false;
                         break;
                     default:
                         Console.WriteLine("Ogiltigt val.");
                         break;
                 }
+
 
                 if (running)
                 {
@@ -57,28 +67,38 @@ namespace Dagboken
 
         private void ShowMenu()
         {
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine("╔════════════════════════════╗");
-            Console.WriteLine("║        DAGBOKEN            ║");
-            Console.WriteLine("╠════════════════════════════╣");
-            Console.WriteLine("║ 1. Skriv ny anteckning     ║");
-            Console.WriteLine("║ 2. Lista alla anteckningar ║");
-            Console.WriteLine("║ 3. Sök anteckning på datum ║");
-            Console.WriteLine("║ 4. Uppdatera anteckning    ║");
-            Console.WriteLine("║ 5. Ta bort anteckning      ║");
-            Console.WriteLine("║ 6. Spara till fil          ║");
-            Console.WriteLine("║ 7. Läs från fil            ║");
-            Console.WriteLine("║ 8. Avsluta                 ║");
-            Console.WriteLine("╚════════════════════════════╝");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("╔════════════════════════════════════════════════════════╗");
+            Console.WriteLine("║                                                        ║");
+            Console.WriteLine("║                  📖 DAGBOKEN – MENY 📖                 ║");
+            Console.WriteLine("║                                                        ║");
+            Console.WriteLine("╠════════════════════════════════════════════════════════╣");
+            Console.WriteLine("║  1. Skriv ny anteckning                               ║");
+            Console.WriteLine("║  2. Lista alla anteckningar                           ║");
+            Console.WriteLine("║  3. Sök anteckning på datum                           ║");
+            Console.WriteLine("║  4. Sök anteckning med text                           ║");
+            Console.WriteLine("║  5. Uppdatera anteckning                              ║");
+            Console.WriteLine("║  6. Ta bort anteckning                                ║");
+            Console.WriteLine("║  7. Spara till fil                                    ║");
+            Console.WriteLine("║  8. Läs från fil                                      ║");
+            Console.WriteLine("║  9. Avsluta                                           ║");
+            Console.WriteLine("╚════════════════════════════════════════════════════════╝");
             Console.ResetColor();
         }
 
+
+
+
         private void WriteEntry()
         {
+
             Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Green;
+            
             Console.WriteLine("╔════════════════════════════════════╗");
             Console.WriteLine("║         NY DAGBOKSANTECKNING       ║");
             Console.WriteLine("╚════════════════════════════════════╝");
+            Console.ResetColor();
 
             DateTime datum = PromptForDate("Datum (yyyy-MM-dd): ");
             if (datum == DateTime.MinValue) return;
@@ -107,30 +127,55 @@ namespace Dagboken
         private void ListEntries()
         {
             Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Magenta;
             Console.WriteLine("╔════════════════════════════════════╗");
             Console.WriteLine("║         ALLA ANTECKNINGAR          ║");
             Console.WriteLine("╚════════════════════════════════════╝");
+            Console.ResetColor();
+
+
+            Console.Write("Läser från minnet");
+            for (int i = 0; i < 3; i++)
+            {
+                Thread.Sleep(400); // Väntar 400 ms per punkt
+                Console.Write(".");
+            }
+            Console.WriteLine("\n");
 
             var entries = _diaryService.GetAllEntries();
 
             if (entries.Count == 0)
+            {
                 Console.WriteLine("Inga anteckningar hittades.");
-            else
-                foreach (var entry in entries.OrderBy(e => e.Date))
-                    Console.WriteLine(entry.ToString());
+                return;
+            }
+
+            foreach (var entry in entries.OrderBy(e => e.Date))
+                Console.WriteLine(entry.ToString());
         }
+
 
         private void SearchEntry()
         {
             Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("╔════════════════════════════╗");
-            Console.WriteLine("║     SÖK ANTECKNING         ║");
+            Console.WriteLine("║   SÖK ANTECKNING PÅ DATUM  ║");
             Console.WriteLine("╚════════════════════════════╝");
+            Console.ResetColor();
 
-            DateTime date = PromptForDate("Datum att söka (åååå-mm-dd eller x): ");
-            if (date == DateTime.MinValue)
+            Console.Write("Ange datum (åååå-mm-dd) eller x för att avbryta: ");
+            string? input = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(input) || input.ToLower() == "x")
             {
                 Console.WriteLine("Sökning avbruten.");
+                return;
+            }
+
+            if (!DateTime.TryParse(input, out DateTime date))
+            {
+                Console.WriteLine("Ogiltigt datumformat.");
                 return;
             }
 
@@ -142,12 +187,51 @@ namespace Dagboken
                 Console.WriteLine("Ingen anteckning hittades.");
         }
 
+        private void SearchEntryByText()
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("╔════════════════════════════╗");
+            Console.WriteLine("║   SÖK ANTECKNING MED TEXT  ║");
+            Console.WriteLine("╚════════════════════════════╝");
+            Console.ResetColor();
+
+
+            Console.Write("Ange sökord eller bokstav (eller x för att avbryta): ");
+            string? query = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(query) || query.ToLower() == "x")
+            {
+                Console.WriteLine("Sökningen avbröts.");
+                return;
+            }
+
+            var results = _diaryService.GetAllEntries()
+                .Where(e => e.Text.Contains(query, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(e => e.Date)
+                .ToList();
+
+            if (results.Count == 0)
+            {
+                Console.WriteLine("Ingen anteckning innehåller den texten.");
+                return;
+            }
+
+            Console.WriteLine($"Hittade {results.Count} anteckningar:");
+            foreach (var entry in results)
+                Console.WriteLine(entry.ToString());
+        }
+
         private void UpdateEntry()
         {
             Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("╔════════════════════════════╗");
             Console.WriteLine("║   UPPDATERA ANTECKNING     ║");
             Console.WriteLine("╚════════════════════════════╝");
+            Console.ResetColor();
+
+
 
             DateTime datum = PromptForDate("Ange datum att uppdatera (åååå-mm-dd eller x): ");
             if (datum == DateTime.MinValue)
@@ -166,16 +250,19 @@ namespace Dagboken
                 Console.WriteLine("Ingen anteckning hittades eller texten var tom.");
         }
 
-
+        // Här är metoden för att ta bort eller uppdatera en anteckning med bara datum, men kan sökas också med text.
+        // Kan ändras senare om det behövs.
 
         private void DeleteEntry()
         {
             Console.Clear();
-            Console.WriteLine("╔════════════════════════════╗");
-            Console.WriteLine("║    TA BORT ANTECKNING      ║");
-            Console.WriteLine("╚════════════════════════════╝");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("╔════════════════════════════════════════════╗");
+            Console.WriteLine("║              TA BORT ANTECKNING           ║");
+            Console.WriteLine("╚════════════════════════════════════════════╝");
+            Console.ResetColor();
 
-            DateTime date = PromptForDate("Datum att ta bort (åååå-mm-dd eller x): ");
+            DateTime date = PromptForDate("Datum att ta bort (åååå-mm-dd eller x): ").Date;
             if (date == DateTime.MinValue)
             {
                 Console.WriteLine("Borttagning avbruten.");
@@ -183,18 +270,26 @@ namespace Dagboken
             }
 
             if (_diaryService.RemoveEntry(date))
+            {
                 Console.WriteLine("Anteckning borttagen.");
+                _fileHandler.SaveEntries(_diaryService.GetAllEntries().ToList());
+            }
             else
+            {
                 Console.WriteLine("Ingen anteckning hittades.");
+            }
         }
+
 
         private void SaveToFile()
         {
             Console.Clear();
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine("╔════════════════════════════╗");
             Console.WriteLine("║      SPARAR TILL FIL       ║");
             Console.WriteLine("╚════════════════════════════╝");
 
+            Console.ResetColor();
             var entries = _diaryService.GetAllEntries();
             _fileHandler.SaveEntries(entries.ToList());
 
@@ -205,10 +300,12 @@ namespace Dagboken
         private void ReadFromFile()
         {
             Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Blue;
             Console.WriteLine("╔════════════════════════════╗");
             Console.WriteLine("║      LÄSER FRÅN FIL        ║");
             Console.WriteLine("╚════════════════════════════╝");
 
+            Console.ResetColor();
             var loaded = _fileHandler.LoadEntries();
             _diaryService.LoadFromFile(loaded);
 
@@ -226,8 +323,8 @@ namespace Dagboken
             }
         }
 
-
-        private void ExportToCsv()
+        // Här är metoden för att exportera anteckningar till CSV-fil.
+       /* private void ExportToCsv()
         {
             var entries = _diaryService.GetAllEntries();
 
@@ -239,9 +336,9 @@ namespace Dagboken
 
             _fileHandler.ExportToCsv(entries.ToList(), "dagbok.csv");
             Console.WriteLine($"{entries.Count} anteckningar har exporterats till dagbok.csv.");
-        }
+        }*/
 
-
+        // En hjälpfunktion för att hantera datuminmatning med felhantering och avbrytning.
         private DateTime PromptForDate(string prompt)
         {
             while (true)
