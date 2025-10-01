@@ -9,6 +9,7 @@ class Program
         var fileHandler = new FileHandler("diary.json");
         diaryService.LoadFromFile(fileHandler.LoadEntries());
 
+
         var menuStub = new MenuStub(diaryService, fileHandler);
         menuStub.Run();
     }

@@ -15,7 +15,6 @@ namespace Dagboken
             _filePath = filePath;
         }
 
-        // Läser anteckningar från JSON-fil
         public List<DiaryEntry> LoadEntries()
         {
             List<DiaryEntry> entries = new();
@@ -37,7 +36,6 @@ namespace Dagboken
             return entries;
         }
 
-        // Sparar anteckningar till JSON-fil
         public void SaveEntries(List<DiaryEntry> entries)
         {
             try
@@ -52,7 +50,6 @@ namespace Dagboken
             }
         }
 
-        // Exporterar anteckningar till CSV-fil
         public void ExportToCsv(List<DiaryEntry> entries, string csvFile)
         {
             try
@@ -75,7 +72,6 @@ namespace Dagboken
             }
         }
 
-        // Loggar fel till separat textfil
         private void LogError(string message)
         {
             string line = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} - {message}";

@@ -55,7 +55,6 @@ namespace Dagboken
             }
         }
 
-
         private void ShowMenu()
         {
             Console.ForegroundColor = ConsoleColor.DarkYellow;
@@ -81,14 +80,28 @@ namespace Dagboken
             Console.WriteLine("║         NY DAGBOKSANTECKNING       ║");
             Console.WriteLine("╚════════════════════════════════════╝");
 
-            DateTime date = PromptForDate("Datum (åååå-mm-dd): ");
+            DateTime datum = PromptForDate("Datum (yyyy-MM-dd): ");
+            if (datum == DateTime.MinValue) return;
+
             Console.Write("Text: ");
             string? text = Console.ReadLine();
 
-            if (_diaryService.AddEntry(date, text ?? ""))
-                Console.WriteLine("Anteckning sparad.");
-            else
+            if (string.IsNullOrWhiteSpace(text))
+            {
                 Console.WriteLine("Texten får inte vara tom.");
+                return;
+            }
+
+            bool success = _diaryService.AddEntry(datum, text);
+            if (success)
+            {
+                Console.WriteLine("Anteckning tillagd.");
+                SaveToFile();
+            }
+            else
+            {
+                Console.WriteLine("Kunde inte lägga till anteckning.");
+            }
         }
 
         private void ListEntries()
@@ -129,7 +142,6 @@ namespace Dagboken
                 Console.WriteLine("Ingen anteckning hittades.");
         }
 
-
         private void UpdateEntry()
         {
             Console.Clear();
@@ -137,15 +149,24 @@ namespace Dagboken
             Console.WriteLine("║   UPPDATERA ANTECKNING     ║");
             Console.WriteLine("╚════════════════════════════╝");
 
-            DateTime date = PromptForDate("Datum att uppdatera: ");
-            Console.Write("Ny text: ");
-            string? newText = Console.ReadLine();
+            DateTime datum = PromptForDate("Ange datum att uppdatera (åååå-mm-dd eller x): ");
+            if (datum == DateTime.MinValue)
+            {
+                Console.WriteLine("Uppdatering avbruten. Återgår till menyn.");
+                return;
+            }
 
-            if (_diaryService.UpdateEntry(date, newText ?? ""))
-                Console.WriteLine("Anteckning uppdaterad.");
+            Console.Write("Ny text: ");
+            string? text = Console.ReadLine();
+
+            bool lyckades = _diaryService.UpdateEntry(datum, text ?? "");
+            if (lyckades)
+                Console.WriteLine("Anteckningen har uppdaterats.");
             else
                 Console.WriteLine("Ingen anteckning hittades eller texten var tom.");
         }
+
+
 
         private void DeleteEntry()
         {
@@ -154,7 +175,12 @@ namespace Dagboken
             Console.WriteLine("║    TA BORT ANTECKNING      ║");
             Console.WriteLine("╚════════════════════════════╝");
 
-            DateTime date = PromptForDate("Datum att ta bort: ");
+            DateTime date = PromptForDate("Datum att ta bort (åååå-mm-dd eller x): ");
+            if (date == DateTime.MinValue)
+            {
+                Console.WriteLine("Borttagning avbruten.");
+                return;
+            }
 
             if (_diaryService.RemoveEntry(date))
                 Console.WriteLine("Anteckning borttagen.");
@@ -164,6 +190,11 @@ namespace Dagboken
 
         private void SaveToFile()
         {
+            Console.Clear();
+            Console.WriteLine("╔════════════════════════════╗");
+            Console.WriteLine("║      SPARAR TILL FIL       ║");
+            Console.WriteLine("╚════════════════════════════╝");
+
             var entries = _diaryService.GetAllEntries();
             _fileHandler.SaveEntries(entries.ToList());
             Console.WriteLine("Sparat till fil.");
@@ -171,9 +202,25 @@ namespace Dagboken
 
         private void ReadFromFile()
         {
+            Console.Clear();
+            Console.WriteLine("╔════════════════════════════╗");
+            Console.WriteLine("║      LÄSER FRÅN FIL        ║");
+            Console.WriteLine("╚════════════════════════════╝");
+
             var loaded = _fileHandler.LoadEntries();
             _diaryService.LoadFromFile(loaded);
             Console.WriteLine("Läst från fil.");
+        }
+
+        private void ExportToCsv()
+        {
+            Console.Clear();
+            Console.WriteLine("╔════════════════════════════╗");
+            Console.WriteLine("║     EXPORTERA TILL CSV     ║");
+            Console.WriteLine("╚════════════════════════════╝");
+
+            var entries = _diaryService.GetAllEntries();
+            _fileHandler.ExportToCsv(entries.ToList(), "dagbok.csv");
         }
 
         private DateTime PromptForDate(string prompt)
@@ -191,13 +238,6 @@ namespace Dagboken
 
                 Console.WriteLine("Ogiltigt datumformat. Skriv igen eller 'x' för att avbryta.");
             }
-        }
-
-
-        private void ExportToCsv()
-        {
-            var entries = _diaryService.GetAllEntries();
-            _fileHandler.ExportToCsv(entries.ToList(), "dagbok.csv");
         }
     }
 }
